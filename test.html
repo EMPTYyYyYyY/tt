@@ -84,6 +84,7 @@
                             <strong>Диастолическое:</strong> ${diastolic} мм рт. ст.<br>
                             ${pulse !== null ? `<strong>Пульс:</strong> ${pulse} уд/мин` : ''}
                         `;
+                        alert('id == ' + JSON.stringify(message.sys_omniuserid))
                         addslots(systolic, diastolic, pulse);
                     }
 
@@ -114,7 +115,7 @@
 
                         xhr.send(data);
                     }
-
+                    
                     widget.querySelector("#connectButton").addEventListener('click', connectToBloodPressureMonitor);
                     return widget;
                 }
