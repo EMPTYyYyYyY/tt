@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Тонометр</title>
+    <script>
+        window.webchatMessageWidgets = {
+            "bloodPressureMonitor": {
+                id: "bloodPressureMonitor",
+                logic(chatApi, params) {
+                    let widget = document.createElement('div');
+                    widget.id = "bloodPressureMonitor";
+                    widget.innerHTML = `
+                        <button id="connectButton">Подключиться к тонометру</button>
+                        <div id="output">Данные появятся здесь...</div>
+                    `;
+                    widget.style = `display: flex; flex-direction: column; width: ${params.webchatWidth}px; height: 300px; align-items: center; justify-content: space-evenly; background-color: lightgray;`;
+
+                    // Функция для подключения к тонометру
+                    async function connectToBloodPressureMonitor() {
+                        try {
+                            const device = await navigator.bluetooth.requestDevice({
+                                filters: [{
+                                    services: ['blood_pressure']
+                                }]
+                            });
+                            const server = await device.gatt.connect();
+                            const service = await server.getPrimaryService('blood_pressure');
+                            const characteristic = await service.getCharacteristic('blood_pressure_measurement');
+                            characteristic.addEventListener('characteristicvaluechanged', handleBloodPressureMeasurement);
+                            await characteristic.startNotifications();
+                            const outputElement = widget.querySelector("#output");
+                            if (outputElement) {
+                                outputElement.innerText = 'Успешно подключено к тонометру. Ожидание данных...';
+                            } else {
+                                console.error("Элемент #output не найден!");
+                            }
+                        } catch (error) {
+                            const outputElement = widget.querySelector("#output");
+                            if (outputElement) {
+                                outputElement.innerText = 'Ошибка подключения: ' + error.message;
+                            } else {
+                                console.error("Элемент #output не найден!");
+                            }
+                        }
+                    }
+
+                    // Функция для обработки данных измерения
+                    function handleBloodPressureMeasurement(event) {
+                        const value = event.target.value;
+                        const dataView = new DataView(value.buffer);
+                        let offset = 0;
+                        const flags = dataView.getUint8(offset);
+                        offset += 1;
+                        const systolic = dataView.getUint16(offset, true);
+                        offset += 2;
+                        const diastolic = dataView.getUint16(offset, true);
+                        offset += 2;
+                        offset += 2; // Пропускаем Mean Arterial Pressure
+                        let pulse = null;
+                        if (flags & 0x04) {
+                            pulse = dataView.getUint16(offset, true);
+                            offset += 2;
+                        }
+                        const output = widget.querySelector("#output");
+                        output.innerHTML = `
+                            <strong>Систолическое:</strong> ${systolic} мм рт. ст.<br>
+                            <strong>Диастолическое:</strong> ${diastolic} мм рт. ст.<br>
+                            ${pulse !== null ? `<strong>Пульс:</strong> ${pulse} уд/мин` : ''}
+                        `;
+                        // addslots(systolic, diastolic, pulse);
+                    }
+
+                    // Функция для отправки данных
+                    //function addslots(systolic, diastolic, pulse) {
+                    //    
+                    //}
+
+                    // Назначаем кнопке обработчик события
+                    widget.querySelector("#connectButton").addEventListener('click', connectToBloodPressureMonitor);
+                    return widget;
+                }
+            }
+        };
+    </script>
+</head>
+<body>
+</body>
+</html>
