@@ -59,6 +59,7 @@
                                 console.error("Элемент #output не найден!");
                             }
                         }
+                        alert('чат апи: ' + JSON.stringify(chatApi));
                     }
 
                     // Функция для обработки данных измерения
@@ -103,7 +104,6 @@
                             if (xhr.status >= 200 && xhr.status < 300) {
                                 const result = JSON.parse(xhr.responseText);
                                 alert('Ответ от сервера: ' + JSON.stringify(result)); // Вывод результата в alert
-                                alert('id == ' + JSON.stringify(message.sys_omniuserid))
                             } else {
                                 alert('Ошибка при авторизации: ' + xhr.statusText); // Вывод ошибки в alert
                             }
