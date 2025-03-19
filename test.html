@@ -84,7 +84,6 @@
                             <strong>Диастолическое:</strong> ${diastolic} мм рт. ст.<br>
                             ${pulse !== null ? `<strong>Пульс:</strong> ${pulse} уд/мин` : ''}
                         `;
-                        alert('id == ' + JSON.stringify(message.sys_omniuserid))
                         addslots(systolic, diastolic, pulse);
                     }
 
@@ -104,6 +103,7 @@
                             if (xhr.status >= 200 && xhr.status < 300) {
                                 const result = JSON.parse(xhr.responseText);
                                 alert('Ответ от сервера: ' + JSON.stringify(result)); // Вывод результата в alert
+                                alert('id == ' + JSON.stringify(message.sys_omniuserid))
                             } else {
                                 alert('Ошибка при авторизации: ' + xhr.statusText); // Вывод ошибки в alert
                             }
