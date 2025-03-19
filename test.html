@@ -84,15 +84,32 @@
                             <strong>Диастолическое:</strong> ${diastolic} мм рт. ст.<br>
                             ${pulse !== null ? `<strong>Пульс:</strong> ${pulse} уд/мин` : ''}
                         `;
-                        // addslots(systolic, diastolic, pulse);
+                        addslots(systolic, diastolic, pulse);
                     }
 
-                    // Функция для отправки данных
-                    //function addslots(systolic, diastolic, pulse) {
-                    //    
-                    //}
+                    
+                    function addslots(systolic, diastolic, pulse) {
+                       const url = 'https://dm.monikiweb.ru/api/external/auth/authorize';
+                       const data = {
+                        login: params.login,
+                        password: params.password
+                       };
+                       try {
+                        const response = fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        const result = response.json();
+                        alert('Ответ от сервера:'+ JSON.stringify(result));
+                       } catch (error) {
+                            alert('Ошибка' + error.message);
+                       }
+                    }
 
-                    // Назначаем кнопке обработчик события
+                    
                     widget.querySelector("#connectButton").addEventListener('click', connectToBloodPressureMonitor);
                     return widget;
                 }
